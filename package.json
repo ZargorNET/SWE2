@@ -13,6 +13,8 @@
     "@mediapipe/camera_utils": "^0.3.1640029074",
     "@mediapipe/drawing_utils": "^0.3.1620248257",
     "@mediapipe/holistic": "^0.5.1635989137",
+    "@types/three": "^0.148.1",
+    "three": "^0.149.0",
     "vue": "^3.2.45"
   },
   "devDependencies": {

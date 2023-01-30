@@ -1,103 +1,92 @@
+<template>
+  <div class="w-full h-full bg-gray-800 flex flex-col text-white items-center">
+    <div ref="renderDivElementRef" class="mt-8">
+      <video class="hidden" ref="videoElementRef"></video>
+    </div>
+    <div class="flex flex-col mt-2">
+      <h1 class="text-5xl bold">Wähle deinen Effekt aus: </h1>
+      <select class="mt-2 cursor-pointer text-xl text-center bg-slate-600"
+              @change="e => onEffectSelect(e.target.value)">
+        <option disabled selected>Keiner</option>
+        <option v-for="effect in effects">{{ effect.name }}</option>
+      </select>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
-import {FACEMESH_TESSELATION, HAND_CONNECTIONS, Holistic, POSE_CONNECTIONS, Results} from "@mediapipe/holistic";
-import {drawConnectors, drawLandmarks} from "@mediapipe/drawing_utils";
-import {Camera} from "@mediapipe/camera_utils";
+import {BoxGeometry, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, WebGLRenderer} from "three";
+import type {Effect} from "@/effects/effect";
+import DebugEffect from "@/effects/debug";
 
 const videoElementRef = ref<HTMLVideoElement>();
-const canvasElementRef = ref<HTMLCanvasElement>();
+const renderDivElementRef = ref<HTMLDivElement>();
 
-const position = ref("");
+const effects = ref<Effect[]>([new DebugEffect()]);
+
+const canvasSize = {width: 700, height: 400};
+let currentEffect: Effect | null;
+let scene: Scene;
+let camera: PerspectiveCamera;
+let renderer: WebGLRenderer;
 
 onMounted(() => {
   const videoElement = videoElementRef.value!;
-  const canvasElement = canvasElementRef.value!;
-  const canvasCtx: CanvasRenderingContext2D = canvasElement.getContext('2d')!;
-  const canvasSize = {width: canvasElement.width, height: canvasElement.height};
 
-  const holistic = new Holistic({
-    locateFile: (file) => {
-      console.log(file);
-      return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
-    }
-  });
-  holistic.setOptions({
-    modelComplexity: 1,
-    smoothLandmarks: true,
-    enableSegmentation: true,
-    smoothSegmentation: true,
-    refineFaceLandmarks: true,
-    minDetectionConfidence: 0.5,
-    minTrackingConfidence: 0.5
-  });
+  scene = new Scene();
+  camera = new PerspectiveCamera(75, canvasSize.width / canvasSize.height);
+  renderer = new WebGLRenderer();
 
-  holistic.onResults((results: Results) => {
-    canvasCtx.save();
-    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+  renderer.setSize(canvasSize.width, canvasSize.height);
+
+  renderDivElementRef.value!.append(renderer.domElement);
+
+  const geometry = new BoxGeometry(1, 1, 1);
+  const material = new MeshBasicMaterial({color: 0x00ff00});
+  const cube = new Mesh(geometry, material);
+  scene.add(cube);
+
+  camera.position.z = 5;
 
 
-    // Only overwrite missing pixels.
-    canvasCtx.globalCompositeOperation = 'destination-atop';
-    canvasCtx.drawImage(
-        results.image, 0, 0, canvasElement.width, canvasElement.height);
-
-    canvasCtx.globalCompositeOperation = 'source-over';
-
-    drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
-        {color: '#00FF00', lineWidth: 4});
-    drawLandmarks(canvasCtx, results.poseLandmarks,
-        {color: '#FF0000', lineWidth: 2});
-    drawConnectors(canvasCtx, results.faceLandmarks, FACEMESH_TESSELATION,
-        {color: '#C0C0C070', lineWidth: 1});
-    drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS,
-        {color: '#CC0000', lineWidth: 5});
-    drawLandmarks(canvasCtx, results.leftHandLandmarks,
-        {color: '#00FF00', lineWidth: 2});
-    drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS,
-        {color: '#00CC00', lineWidth: 5});
-    drawLandmarks(canvasCtx, results.rightHandLandmarks,
-        {color: '#FF0000', lineWidth: 2});
-
-
-    if (results.faceLandmarks != undefined && results.faceLandmarks.length > 0) {
-      const nose = results.faceLandmarks[1];
-      const noseXYpx = {x: nose.x * canvasSize.width, y: nose.y * canvasSize.height};
-
-      canvasCtx.strokeStyle = "lightgreen";
-      canvasCtx.lineWidth = 2;
-      canvasCtx.beginPath();
-      canvasCtx.moveTo(noseXYpx.x, 0);
-      canvasCtx.lineTo(noseXYpx.x, canvasSize.height);
-      canvasCtx.stroke();
-
-      canvasCtx.beginPath();
-      canvasCtx.moveTo(0, noseXYpx.y);
-      canvasCtx.lineTo(canvasSize.width, noseXYpx.y);
-      canvasCtx.stroke();
-
-      position.value = `${JSON.stringify(noseXYpx)}`;
-
-    }
-
-    canvasCtx.restore();
-  });
-
-  const camera = new Camera(videoElement, {
-    onFrame: async () => {
-      await holistic.send({image: videoElement});
-    },
-    width: 1280,
-    height: 720
-  });
-  camera.start();
-
+  window.addEventListener('resize', onWindowResize);
+  animate();
 });
-</script>
 
-<template>
-  <div class="w-full h-full bg-gray-800">
-    <video class="hidden" ref="videoElementRef"></video>
-    <canvas width="1280" height="720" ref="canvasElementRef"></canvas>
-    <p class="text-white">{{ position }}</p>
-  </div>
-</template>
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  if (currentEffect != null)
+    currentEffect.onRender();
+
+  renderer.render(scene, camera);
+}
+
+
+function onEffectSelect(selected: String) {
+  const effectsArray = effects.value;
+
+  const effect = effectsArray.find(e => e.name === selected);
+
+  if (effect == null)
+    return;
+
+  if (currentEffect) {
+    currentEffect.onDestroy();
+    scene.clear();
+  }
+
+  effect.onInit(scene, camera);
+  currentEffect = effect;
+}
+
+
+</script>
