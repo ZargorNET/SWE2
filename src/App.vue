@@ -21,6 +21,7 @@ import type {Effect} from "@/effects/effect";
 import DebugEffect from "@/effects/debug";
 import {Holistic} from "@mediapipe/holistic";
 import {Camera} from "@mediapipe/camera_utils";
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 
 const videoElementRef = ref<HTMLVideoElement>();
 const renderDivElementRef = ref<HTMLDivElement>();
@@ -32,12 +33,14 @@ let currentEffect: Effect | null;
 let scene: Scene;
 let camera: PerspectiveCamera;
 let renderer: WebGLRenderer;
+let controls: OrbitControls;
 
 onMounted(() => {
   const videoElement = videoElementRef.value!;
   scene = new Scene();
   camera = new PerspectiveCamera(100, canvasSize.width / canvasSize.height);
   renderer = new WebGLRenderer();
+  controls = new OrbitControls(camera, renderer.domElement);
 
   renderer.setSize(canvasSize.width, canvasSize.height);
 
@@ -100,6 +103,7 @@ function animate() {
   if (currentEffect != null)
     currentEffect.onRender();
 
+  controls.update();
   renderer.render(scene, camera);
 }
 
