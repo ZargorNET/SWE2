@@ -16,9 +16,11 @@
 
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
-import {BoxGeometry, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, WebGLRenderer} from "three";
+import {PerspectiveCamera, Scene, VideoTexture, WebGLRenderer} from "three";
 import type {Effect} from "@/effects/effect";
 import DebugEffect from "@/effects/debug";
+import {Holistic} from "@mediapipe/holistic";
+import {Camera} from "@mediapipe/camera_utils";
 
 const videoElementRef = ref<HTMLVideoElement>();
 const renderDivElementRef = ref<HTMLDivElement>();
@@ -33,24 +35,55 @@ let renderer: WebGLRenderer;
 
 onMounted(() => {
   const videoElement = videoElementRef.value!;
-
   scene = new Scene();
-  camera = new PerspectiveCamera(75, canvasSize.width / canvasSize.height);
+  camera = new PerspectiveCamera(100, canvasSize.width / canvasSize.height);
   renderer = new WebGLRenderer();
 
   renderer.setSize(canvasSize.width, canvasSize.height);
 
   renderDivElementRef.value!.append(renderer.domElement);
 
-  const geometry = new BoxGeometry(1, 1, 1);
-  const material = new MeshBasicMaterial({color: 0x00ff00});
-  const cube = new Mesh(geometry, material);
-  scene.add(cube);
-
   camera.position.z = 5;
 
 
   window.addEventListener('resize', onWindowResize);
+
+  navigator.mediaDevices
+      .getUserMedia({video: {width: 1280, height: 720, facingMode: 'user'}})
+      .then(stream => {
+        videoElement.srcObject = stream;
+        videoElement.play();
+      });
+
+  const holistic = new Holistic({
+    locateFile: (file) => {
+      console.log(file);
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
+    }
+  });
+  holistic.setOptions({
+    modelComplexity: 1,
+    smoothLandmarks: true,
+    enableSegmentation: true,
+    smoothSegmentation: true,
+    refineFaceLandmarks: true,
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5
+  });
+
+  holistic.onResults(results => {
+    currentEffect?.onAIResults(results);
+  });
+
+  const aiCamera = new Camera(videoElement, {
+    onFrame: async () => {
+      await holistic.send({image: videoElement});
+    },
+    width: 1280,
+    height: 720
+  });
+  aiCamera.start();
+
   animate();
 });
 
@@ -84,7 +117,7 @@ function onEffectSelect(selected: String) {
     scene.clear();
   }
 
-  effect.onInit(scene, camera);
+  effect.onInit(scene, camera, {videoTexture: new VideoTexture(videoElementRef.value!)});
   currentEffect = effect;
 }
 
