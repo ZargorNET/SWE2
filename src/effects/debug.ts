@@ -18,7 +18,7 @@ export default class DebugEffect implements Effect {
     onInit(scene: Scene, camera: Camera, video: Video): void {
         this.scene = scene;
         this.camera = camera;
-        const geometry = new BoxGeometry(5, 5, 1);
+        const geometry = new BoxGeometry(5, 5, 5);
         const material = new MeshBasicMaterial({map: video.videoTexture});
         const cube = new Mesh(geometry, material);
 
@@ -28,7 +28,7 @@ export default class DebugEffect implements Effect {
         line.name = "yLine";
 
         scene.add(cube);
-        scene.add(line)
+        scene.add(line);
     }
 
     onAIResults(results: Results): void {
@@ -36,8 +36,8 @@ export default class DebugEffect implements Effect {
 
         console.log(nose);
         const points = [];
-        points.push(new Vector3(-1, nose.y, -1).project(this.camera));
-        points.push(new Vector3(1, nose.y, -1).project(this.camera));
+        points.push(new Vector3(-5, -nose.y, -1));
+        points.push(new Vector3(5, -nose.y, -1));
 
         const geometry = new BufferGeometry().setFromPoints(points);
 
