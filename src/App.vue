@@ -16,33 +16,40 @@
 
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
-import {PerspectiveCamera, Scene, VideoTexture, WebGLRenderer} from "three";
+import {PerspectiveCamera, ReinhardToneMapping, Scene, VideoTexture, WebGLRenderer} from "three";
 import type {Effect} from "@/effects/effect";
 import DebugEffect from "@/effects/debug";
 import {Holistic} from "@mediapipe/holistic";
 import {Camera} from "@mediapipe/camera_utils";
+import ModelEffect from "@/effects/model";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import {CubeEffect} from "@/effects/cube";
+import {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
+import {RenderPass} from "three/examples/jsm/postprocessing/RenderPass";
 
 const videoElementRef = ref<HTMLVideoElement>();
 const renderDivElementRef = ref<HTMLDivElement>();
 
-const effects = ref<Effect[]>([new DebugEffect()]);
+const effects = ref<Effect[]>([new DebugEffect(), new ModelEffect(), new CubeEffect()]);
 
-const canvasSize = {width: 700, height: 400};
+const canvasSize = {width: 1200, height: 600};
 let currentEffect: Effect | null;
 let scene: Scene;
 let camera: PerspectiveCamera;
 let renderer: WebGLRenderer;
 let controls: OrbitControls;
+let composer: EffectComposer;
 
 onMounted(() => {
   const videoElement = videoElementRef.value!;
   scene = new Scene();
-  camera = new PerspectiveCamera(100, canvasSize.width / canvasSize.height);
-  renderer = new WebGLRenderer();
+  camera = new PerspectiveCamera(75, canvasSize.width / canvasSize.height);
+  renderer = new WebGLRenderer({antialias: true});
   controls = new OrbitControls(camera, renderer.domElement);
 
   renderer.setSize(canvasSize.width, canvasSize.height);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.toneMapping = ReinhardToneMapping;
 
   renderDivElementRef.value!.append(renderer.domElement);
 
@@ -75,6 +82,10 @@ onMounted(() => {
   });
 
   holistic.onResults(results => {
+    // noinspection JSIncompatibleTypesComparison
+    if (results == null || results.faceLandmarks == null)
+      return;
+
     currentEffect?.onAIResults(results);
   });
 
@@ -87,14 +98,20 @@ onMounted(() => {
   });
   aiCamera.start();
 
+  composer = new EffectComposer(renderer);
+
   animate();
 });
 
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  const width = canvasSize.width;
+  const height = canvasSize.height;
+
+  camera.aspect = width / height;
   camera.updateProjectionMatrix();
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(width, height);
+  composer.setSize(width, height);
 }
 
 function animate() {
@@ -104,7 +121,7 @@ function animate() {
     currentEffect.onRender();
 
   controls.update();
-  renderer.render(scene, camera);
+  composer.render();
 }
 
 
@@ -119,9 +136,15 @@ function onEffectSelect(selected: String) {
   if (currentEffect) {
     currentEffect.onDestroy();
     scene.clear();
+    composer.reset();
   }
 
-  effect.onInit(scene, camera, {videoTexture: new VideoTexture(videoElementRef.value!)});
+  composer = new EffectComposer(renderer);
+  scene = new Scene();
+
+  composer.addPass(new RenderPass(scene, camera));
+
+  effect.onInit(scene, camera, {videoTexture: new VideoTexture(videoElementRef.value!)}, composer);
   currentEffect = effect;
 }
 

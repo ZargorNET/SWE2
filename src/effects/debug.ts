@@ -3,6 +3,7 @@ import type {Scene} from "three";
 import {BoxGeometry, BufferGeometry, Camera, Line, LineBasicMaterial, Mesh, MeshBasicMaterial, Vector3} from "three";
 import type {Video} from "@/video";
 import type {Results} from "@mediapipe/holistic";
+import type {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
 
 export default class DebugEffect implements Effect {
     name = "debug";
@@ -15,7 +16,7 @@ export default class DebugEffect implements Effect {
     scene: Scene = null!;
     camera: Camera = null!;
 
-    onInit(scene: Scene, camera: Camera, video: Video): void {
+    onInit(scene: Scene, camera: Camera, video: Video, composer: EffectComposer): void {
         this.scene = scene;
         this.camera = camera;
         const geometry = new BoxGeometry(5, 5, 5);
