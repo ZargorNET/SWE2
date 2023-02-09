@@ -13,20 +13,30 @@ export class CubeEffect implements Effect {
     name: String = "Cube";
 
     onAIResults(results: Results): void {
-        if (results.faceLandmarks.length < 2)
-            return;
+        if (results.faceLandmarks.length > 1) {
+            const nose = results.faceLandmarks[1];
 
-        const nose = results.faceLandmarks[1];
+            let x = (nose.x - 0.5);
+            let y = (nose.y - 0.5);
 
-        let x = (nose.x - 0.5);
-        let y = (nose.y - 0.5);
+            if (Math.abs(x) < 0.05)
+                x = 0;
+            if (Math.abs(y) < 0.05)
+                y = 0;
 
-        if (Math.abs(x) < 0.05)
-            x = 0;
-        if (Math.abs(y) < 0.05)
-            y = 0;
+            this.currentRotation = new Vector2(x, y);
+        }
 
-        this.currentRotation = new Vector2(x, y);
+
+        if (results.rightHandLandmarks != null) {
+            if (this.isHandRemovedAgain) {
+                this.isHandRemovedAgain = false;
+
+                this.clipAction.paused = !this.clipAction.paused;
+            }
+        } else {
+            this.isHandRemovedAgain = true;
+        }
     }
 
     onDestroy(): void {
@@ -43,6 +53,11 @@ export class CubeEffect implements Effect {
 
     composer: EffectComposer = null!;
     bloomPass: UnrealBloomPass = null!;
+
+    // @ts-ignore
+    clipAction: AnimationAction = null!;
+
+    isHandRemovedAgain = true;
 
     onInit(scene: Scene, camera: Camera, video: Video, composer: EffectComposer): void {
         this.composer = composer;
@@ -69,7 +84,8 @@ export class CubeEffect implements Effect {
 
             const clip = gltf.animations[0];
             this.mixer = new AnimationMixer(model);
-            this.mixer.clipAction(clip.optimize()).play();
+            this.clipAction = this.mixer.clipAction(clip.optimize());
+            this.clipAction.play();
         });
     }
 
@@ -77,9 +93,9 @@ export class CubeEffect implements Effect {
         const delta = this.clock.getDelta();
 
         //    this.obj.rotateX(this.currentRotation.y * delta);
-        this.obj.rotateY(this.currentRotation.x * delta);
+        this.obj?.rotateY(this.currentRotation.x * delta);
 
-        this.mixer.update(delta);
+        this.mixer?.update(delta);
     }
 
 }
