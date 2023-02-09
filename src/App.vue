@@ -1,9 +1,9 @@
 <template>
-  <div class="w-full h-full bg-gray-800 flex flex-col text-white items-center">
+  <div class="w-full h-auto min-h-full bg-gray-800 flex flex-col text-white items-center">
     <div ref="renderDivElementRef" class="mt-8">
       <video class="hidden" ref="videoElementRef"></video>
     </div>
-    <div class="flex flex-col mt-2">
+    <div class="flex flex-col my-2">
       <h1 class="text-5xl bold">Wähle deinen Effekt aus: </h1>
       <select class="mt-2 cursor-pointer text-xl text-center bg-slate-600"
               @change="e => onEffectSelect(e.target.value)">
