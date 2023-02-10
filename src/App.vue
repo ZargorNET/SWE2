@@ -26,11 +26,12 @@ import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import {CubeEffect} from "@/effects/cube";
 import {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
 import {RenderPass} from "three/examples/jsm/postprocessing/RenderPass";
+import { DanielEffect } from "@/effects/daniel";
 
 const videoElementRef = ref<HTMLVideoElement>();
 const renderDivElementRef = ref<HTMLDivElement>();
 
-const effects = ref<Effect[]>([new DebugEffect(), new ModelEffect(), new CubeEffect()]);
+const effects = ref<Effect[]>([new DebugEffect(), new ModelEffect(), new CubeEffect(), new DanielEffect()]);
 
 const canvasSize = {width: 1200, height: 600};
 let currentEffect: Effect | null;
@@ -101,6 +102,8 @@ onMounted(() => {
   composer = new EffectComposer(renderer);
 
   animate();
+
+  onEffectSelect("Daniel");
 });
 
 function onWindowResize() {
