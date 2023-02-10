@@ -75,6 +75,7 @@ export class DanielEffect implements Effect {
             const object = new Mesh( geometry, material );
             let transformed = transform(this.nose.x, this.nose.y);
             object.position.set(transformed.x, transformed.y, 0)
+            console.log(this.nose.x, this.nose.y)
             console.log(transformed)
             this.scene.add(object);
             this.spheres.push(new Sphere(object, 0))
@@ -87,7 +88,6 @@ export class DanielEffect implements Effect {
         
         toRaw(this.spheres).forEach((s) => {
             if(s.lifetime >= 1) {
-                console.log("removing " + s.lifetime, s);
                 this.scene.remove(s.object);
                 this.spheres = toRaw(this.spheres).filter((x) => x !== s );
             }
@@ -101,7 +101,7 @@ export class DanielEffect implements Effect {
 
 function transform(x: number, y:number) {
         return {
-            x: x*75,
-            y: -y*32
+            x: (x*2-1)*75,
+            y: -(y*2-1)*32
         }
 }
