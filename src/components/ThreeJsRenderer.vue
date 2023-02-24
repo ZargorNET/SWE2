@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div ref="renderDivElementRef" class="mt-8">
+    <div ref="renderDivElementRef">
     </div>
   </div>
 </template>
@@ -35,7 +35,7 @@ onMounted(() => {
   renderer = new WebGLRenderer({antialias: true});
   controls = new OrbitControls(camera, renderer.domElement);
 
-  renderer.setSize(size.width, size.height);
+  renderer.setSize(size.width, size.height, true);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.toneMapping = ReinhardToneMapping;
 

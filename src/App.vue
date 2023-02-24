@@ -1,12 +1,20 @@
 <template>
   <div class="w-full h-auto min-h-full bg-[#1d1d1f] flex flex-col text-white items-center">
+    <div class="mt-64 h-[50vh]">
+      <h1 class="font-josefin text-9xl">art23</h1>
+    </div>
     <video class="hidden" ref="videoElementRef"></video>
-    <ThreeJsRenderer :key="counter" v-if="currentEffectType === 'three'" :effect="currentEffect"
-                     :video-element="videoElementRef"
-                     :size="size"/>
-    <CanvasRenderer :key="counter" v-if="currentEffectType === 'canvas'" :effect="currentEffect"
-                    :video-element="videoElementRef"
-                    :size="size"/>
+    <div class="bg-black rounded-2xl p-4 relative">
+      <div :style="{'width': size.width + 'px', 'height': size.height + 'px'}">
+        <ThreeJsRenderer :key="counter" v-if="currentEffectType === 'three'" :effect="currentEffect"
+                         :video-element="videoElementRef"
+                         :size="size"/>
+        <CanvasRenderer :key="counter" v-if="currentEffectType === 'canvas'" :effect="currentEffect"
+                        :video-element="videoElementRef"
+                        :size="size"/>
+      </div>
+
+    </div>
     <div class="flex flex-col my-2">
       <h1 class="text-5xl bold">Wähle deinen Effekt aus: </h1>
       <select class="mt-2 cursor-pointer text-xl text-center bg-slate-600"
@@ -18,6 +26,8 @@
         <option v-for="effect in canvasEffects">{{ effect.name }}</option>
       </select>
     </div>
+
+    <div class="h-8"></div>
   </div>
 </template>
 
@@ -72,7 +82,7 @@ onMounted(() => {
   const videoElement = videoElementRef.value!;
 
   navigator.mediaDevices
-      .getUserMedia({video: {width: 1280, height: 720, facingMode: 'user'}})
+      .getUserMedia({video: {width: size.width, height: size.height, facingMode: 'user'}})
       .then(stream => {
         videoElement.srcObject = stream;
         videoElement.play();

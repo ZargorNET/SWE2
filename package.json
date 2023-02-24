@@ -15,7 +15,7 @@
     "@mediapipe/holistic": "^0.5.1635989137",
     "@types/three": "^0.148.1",
     "three": "^0.149.0",
-    "vue": "^3.2.45"
+    "vue": "^3.2.47 "
   },
   "devDependencies": {
     "@types/node": "^18.11.12",
