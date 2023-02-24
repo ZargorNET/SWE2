@@ -1,22 +1,34 @@
-import type {Effect} from "@/effects/effect";
 import type {NormalizedLandmark, Results} from "@mediapipe/holistic";
 import type {Video} from "@/video";
-import {Mesh, MeshBasicMaterial, SphereGeometry, type Camera, type Scene} from "three";
-import {AmbientLight, AnimationMixer, Clock, Group, PointLight, Vector2} from "three";
-import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import ionModel from "./PrimaryIonDrive.glb?url";
+import {
+    AmbientLight,
+    AnimationMixer,
+    type Camera,
+    Clock,
+    Group,
+    Mesh,
+    MeshBasicMaterial,
+    PointLight,
+    type Scene,
+    SphereGeometry,
+    Vector2
+} from "three";
 import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import type {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
 import {toRaw} from "vue";
+import type ThreeEffect from "@/effects/three_effect";
+import type {HolisticEffect} from "@/effects/ai_results_effect";
 
 class Sphere {
-    constructor(public object: Mesh, public lifetime: number) {}   
+    constructor(public object: Mesh, public lifetime: number) {
+    }
 }
 
-export class DanielEffect implements Effect {
+export class DanielEffect implements ThreeEffect, HolisticEffect {
     name: String = "Daniel";
     nose: NormalizedLandmark | undefined;
-    onAIResults(results: Results): void {
+
+    onHolisticAIResults(results: Results): void {
         if (results.faceLandmarks.length > 1) {
             this.nose = results.faceLandmarks[1];
 

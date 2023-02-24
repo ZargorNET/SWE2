@@ -1,18 +1,19 @@
-import type {Effect} from "@/effects/effect";
 import type {Results} from "@mediapipe/holistic";
 import type {Video} from "@/video";
 import type {Camera, Scene} from "three";
 import {AmbientLight, AnimationMixer, Clock, Group, PointLight, Vector2} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import ionModel from "./PrimaryIonDrive.glb?url";
+import ionModel from "../PrimaryIonDrive.glb?url";
 import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import type {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
 import {toRaw} from "vue";
+import type ThreeEffect from "@/effects/three_effect";
+import type {HolisticEffect} from "@/effects/ai_results_effect";
 
-export class CubeEffect implements Effect {
+export class CubeEffect implements ThreeEffect, HolisticEffect {
     name: String = "Cube";
 
-    onAIResults(results: Results): void {
+    onHolisticAIResults(results: Results): void {
         if (results.faceLandmarks.length > 1) {
             const nose = results.faceLandmarks[1];
 

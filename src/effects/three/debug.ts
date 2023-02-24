@@ -1,22 +1,24 @@
-import type {Effect} from "@/effects/effect";
 import type {Scene} from "three";
 import {BoxGeometry, BufferGeometry, Camera, Line, LineBasicMaterial, Mesh, MeshBasicMaterial, Vector3} from "three";
 import type {Video} from "@/video";
 import type {Results} from "@mediapipe/holistic";
 import type {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
+import type ThreeEffect from "@/effects/three_effect";
+import type {HolisticEffect} from "@/effects/ai_results_effect";
 
-export default class DebugEffect implements Effect {
+export default class DebugEffect implements ThreeEffect, HolisticEffect {
     name = "debug";
 
-    onDestroy(): void {
-        alert("DESTROY")
-    }
-
-
     scene: Scene = null!;
+
     camera: Camera = null!;
 
+    onDestroy(): void {
+        console.log("DESTROY");
+    }
+
     onInit(scene: Scene, camera: Camera, video: Video, composer: EffectComposer): void {
+        console.log("Initializing debug...");
         this.scene = scene;
         this.camera = camera;
         const geometry = new BoxGeometry(5, 5, 5);
@@ -32,7 +34,7 @@ export default class DebugEffect implements Effect {
         scene.add(line);
     }
 
-    onAIResults(results: Results): void {
+    onHolisticAIResults(results: Results): void {
         const nose = results.faceLandmarks[1];
 
         console.log(nose);

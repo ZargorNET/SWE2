@@ -1,17 +1,18 @@
-import type {Effect} from "@/effects/effect";
 import type {Results} from "@mediapipe/holistic";
 import type {Camera, Scene} from "three";
 import {AmbientLight, Color, Fog, SkeletonHelper} from "three";
 import type {Video} from "@/video";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import modelUrl from "./model/obj.gltf?url";
+import modelUrl from "../model/obj.gltf?url";
 import type {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
 import {toRaw} from "vue";
+import type ThreeEffect from "@/effects/three_effect";
+import type {HolisticEffect} from "@/effects/ai_results_effect";
 
-export default class ModelEffect implements Effect {
+export default class ModelEffect implements ThreeEffect, HolisticEffect {
     name: String = "Model";
 
-    onAIResults(results: Results): void {
+    onHolisticAIResults(results: Results): void {
     }
 
     onDestroy(): void {
