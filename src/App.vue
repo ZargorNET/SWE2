@@ -1,10 +1,26 @@
 <template>
-  <div class="w-full h-auto min-h-full bg-[#1d1d1f] flex flex-col text-white items-center">
-    <div class="mt-64 h-[50vh]">
-      <h1 class="font-josefin text-9xl">art23</h1>
+  <div class="w-full h-auto min-h-full bg-[black] flex flex-col text-white items-center">
+    <div class="pointer-events-none w-full h-screen absolute">
+      <img src="@/assets/White-Pawn.webp" alt="White Pawn" class="absolute right-20 bottom-20 animated">
+      <img src="@/assets/Black-Queen.webp" alt="Black Queen" class="absolute animated left-20 top-40">
+
+      <img src="@/assets/Black-Knight.webp" alt="Black Knight" class="absolute left-[55%] top-2 animated z-10">
+      <img src="@/assets/White-Rook.webp" alt="White Rook" class="absolute left-[27%] top-[300px] animated z-10">
     </div>
+
+    <div class="mt-64 h-[60vh]">
+      <div class="relative">
+        <h1 class="font-josefin text-[10rem] glitch" data-text="art23">art23</h1>
+        <h1 class="font-josefin text-[10rem] glow">art23</h1>
+        <div class="absolute -right-20 ">
+          <p class="subtitle font-serif text-3xl text-right">Eine neue Art, Kunst zu entdecken.</p>
+        </div>
+      </div>
+    </div>
+
+
     <video class="hidden" ref="videoElementRef"></video>
-    <div class="bg-black rounded-2xl p-4 relative">
+    <div class="bg-white rounded-2xl p-4 relative">
       <div :style="{'width': size.width + 'px', 'height': size.height + 'px'}">
         <ThreeJsRenderer :key="counter" v-if="currentEffectType === 'three'" :effect="currentEffect"
                          :video-element="videoElementRef"
@@ -17,7 +33,7 @@
     </div>
     <div class="flex flex-col my-2">
       <h1 class="text-5xl bold">Wähle deinen Effekt aus: </h1>
-      <select class="mt-2 cursor-pointer text-xl text-center bg-slate-600"
+      <select class="mt-2 cursor-pointer text-xl text-center bg-white text-black"
               @change="e => onEffectSelect(e.target.value)">
         <option disabled selected>Keiner</option>
         <option disabled>ThreeJS Effekte</option>
@@ -26,13 +42,14 @@
         <option v-for="effect in canvasEffects">{{ effect.name }}</option>
       </select>
     </div>
-
-    <div class="h-8"></div>
+    <div class="py-4 text-neutral-600 font-mono text-xs">
+      <p>Ein Projekt von Daniel, Niklas und Conner</p>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, toRaw} from "vue";
+import {ref, toRaw} from "vue";
 import type {Effect} from "@/effects/effect";
 import DebugEffect from "@/effects/three/debug";
 import ModelEffect from "@/effects/three/model";
@@ -58,6 +75,8 @@ const counter = ref<number>(0); // force destroy effect renderer components
 const videoElementRef = ref<HTMLVideoElement>();
 
 function onEffectSelect(selected: String) {
+  init();
+
   let effect: Effect | undefined = threeEffects.value.find(e => e.name === selected);
   let effectType: "three" | "canvas" = "three";
 
@@ -78,7 +97,14 @@ function onEffectSelect(selected: String) {
   counter.value = counter.value + 1;
 }
 
-onMounted(() => {
+let inited = false;
+
+function init() {
+  if (inited)
+    return;
+  inited = true;
+
+
   const videoElement = videoElementRef.value!;
 
   navigator.mediaDevices
@@ -125,5 +151,140 @@ onMounted(() => {
     height: size.height
   });
   aiCamera.start();
-});
+}
+
 </script>
+
+<style lang="scss">
+.animated {
+  animation: 20s ease-in-out -16.8475s infinite normal none running hovering;
+}
+
+@keyframes hovering {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(0, 15%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.glitch {
+  color: rgb(223, 191, 191);
+  position: relative;
+  font-size: 9vw;
+  // margin: 70px 200px;
+  animation: glitch 5s 5s infinite;
+}
+
+.glitch::before {
+  content: attr(data-text);
+  position: absolute;
+  left: -2px;
+  text-shadow: -5px 0 magenta;
+  background: black;
+  overflow: hidden;
+  top: 0;
+  animation: noise-1 4s linear infinite alternate-reverse, glitch 5s 5.05s infinite;
+}
+
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 2px;
+  text-shadow: -5px 0 lightgreen;
+  background: black;
+  overflow: hidden;
+  top: 0;
+  animation: noise-2 4s linear infinite alternate-reverse, glitch 5s 5s infinite;
+}
+
+@keyframes glitch {
+  1% {
+    transform: rotateX(10deg) skewX(90deg);
+  }
+  2% {
+    transform: rotateX(0deg) skewX(0deg);
+  }
+}
+
+@keyframes noise-1 {
+  $steps: 30;
+  @for $i from 1 through $steps {
+    #{percentage($i*(calc(1/$steps)))} {
+      $top: random(100);
+      $bottom: random(101 - $top);
+      clip-path: inset(#{$top}px 0 #{$bottom}px 0);
+    }
+  }
+}
+
+@keyframes noise-2 {
+  $steps: 30;
+  @for $i from 0 through $steps {
+    #{percentage($i*(calc(1/$steps)))} {
+      $top: random(100);
+      $bottom: random(101 - $top);
+      clip-path: inset(#{$top}px 0 #{$bottom}px 0);
+    }
+  }
+}
+
+.scanlines {
+  overflow: hidden;
+  mix-blend-mode: difference;
+}
+
+.scanlines::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+  background: repeating-linear-gradient(
+          to bottom,
+          transparent 0%,
+          rgba(255, 255, 255, 0.05) .5%,
+          transparent 1%
+  );
+
+  animation: fudge 7s ease-in-out alternate infinite;
+}
+
+
+@keyframes fudge {
+  from {
+    transform: translate(0px, 0px);
+  }
+  to {
+    transform: translate(0px, 2%);
+  }
+}
+
+.glow {
+  @extend .glitch;
+  text-shadow: 0 0 1000px rgb(223, 191, 191);
+  color: transparent;
+  position: absolute;
+  top: 0;
+}
+
+.subtitle {
+  animation: glitch-2 5s 5.02s infinite;
+}
+
+@keyframes glitch-2 {
+  1% {
+    transform: rotateX(10deg) skewX(70deg);
+  }
+  2% {
+    transform: rotateX(0deg) skewX(0deg);
+  }
+}
+
+</style>
