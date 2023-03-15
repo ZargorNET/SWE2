@@ -4,11 +4,11 @@
       <img src="@/assets/White-Pawn.webp" alt="White Pawn" class="absolute right-20 bottom-20 animated">
       <img src="@/assets/Black-Queen.webp" alt="Black Queen" class="absolute animated left-20 top-40">
 
-      <img src="@/assets/Black-Knight.webp" alt="Black Knight" class="absolute left-[55%] top-2 animated z-10">
-      <img src="@/assets/White-Rook.webp" alt="White Rook" class="absolute left-[27%] top-[300px] animated z-10">
+      <img src="@/assets/Black-Knight.webp" alt="Black Knight" class="absolute left-[55%] top-2 animated z-20">
+      <img src="@/assets/White-Rook.webp" alt="White Rook" class="absolute left-[27%] top-[300px] animated z-0">
     </div>
 
-    <div class="mt-64 h-[60vh]">
+    <div class="mt-64 h-[60vh] z-10">
       <div class="relative">
         <h1 class="font-josefin text-[10rem] glitch" data-text="art23">art23</h1>
         <h1 class="font-josefin text-[10rem] glow">art23</h1>
@@ -175,8 +175,6 @@ function init() {
 .glitch {
   color: rgb(223, 191, 191);
   position: relative;
-  font-size: 9vw;
-  // margin: 70px 200px;
   animation: glitch 5s 5s infinite;
 }
 
@@ -184,11 +182,11 @@ function init() {
   content: attr(data-text);
   position: absolute;
   left: -2px;
-  text-shadow: -5px 0 magenta;
-  background: black;
+  text-shadow: -2px 0 magenta;
+  background: transparent;
   overflow: hidden;
   top: 0;
-  animation: noise-1 4s linear infinite alternate-reverse, glitch 5s 5.05s infinite;
+  animation: noise-1 3s linear infinite alternate-reverse, glitch 5s 5.05s infinite;
 }
 
 .glitch::after {
@@ -196,10 +194,10 @@ function init() {
   position: absolute;
   left: 2px;
   text-shadow: -5px 0 lightgreen;
-  background: black;
+  background: transparent;
   overflow: hidden;
   top: 0;
-  animation: noise-2 4s linear infinite alternate-reverse, glitch 5s 5s infinite;
+  animation: noise-2 3s linear infinite alternate-reverse, glitch 5s 5s infinite;
 }
 
 @keyframes glitch {
