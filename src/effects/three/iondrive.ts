@@ -10,8 +10,8 @@ import {toRaw} from "vue";
 import type ThreeEffect from "@/effects/three_effect";
 import type {HolisticEffect} from "@/effects/ai_results_effect";
 
-export class CubeEffect implements ThreeEffect, HolisticEffect {
-    name: String = "Cube";
+export class IonDriveEffect implements ThreeEffect, HolisticEffect {
+    name: String = "ION Drive";
 
     onHolisticAIResults(results: Results): void {
         if (results.faceLandmarks.length > 1) {
