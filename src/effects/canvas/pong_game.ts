@@ -24,6 +24,7 @@ export default class PongGameEffect implements CanvasEffect, HolisticEffect {
 
         this.pong.x = this.ctx.canvas.width / 2;
         this.pong.y = 100;
+        this.nose = {x: this.ctx.canvas.width / 2, y: this.ctx.canvas.height / 2};
         this.barrier.pos = new Vector2(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
     }
 
