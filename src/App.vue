@@ -51,22 +51,22 @@
 <script setup lang="ts">
 import {ref, toRaw} from "vue";
 import type {Effect} from "@/effects/effect";
-import DebugEffect from "@/effects/three/debug";
-import ModelEffect from "@/effects/three/model";
-import {CubeEffect} from "@/effects/three/cube";
-import {DanielEffect} from "@/effects/three/daniel";
+import CubeEffect from "@/effects/three/cube_effect";
+import {IonDriveEffect} from "@/effects/three/iondrive";
+import {DrawNoseEffect} from "@/effects/three/draw_nose";
 import type ThreeEffect from "@/effects/three_effect";
 import ThreeJsRenderer from "@/components/ThreeJsRenderer.vue";
 import {Holistic} from "@mediapipe/holistic";
 import {Camera} from "@mediapipe/camera_utils";
-import DebugMeshEffect from "@/effects/canvas/debug_mesh";
+import AIMeshEffect from "@/effects/canvas/ai_mesh";
 import type CanvasEffect from "@/effects/canvas_effect";
 import CanvasRenderer from "@/components/CanvasRenderer.vue";
+import PongGameEffect from "@/effects/canvas/pong_game";
 
 const size = {width: 900, height: 600};
 
-const threeEffects = ref<ThreeEffect[]>([new DebugEffect(), new ModelEffect(), new CubeEffect(), new DanielEffect()]);
-const canvasEffects = ref<CanvasEffect[]>([new DebugMeshEffect()]);
+const threeEffects = ref<ThreeEffect[]>([new CubeEffect(), new IonDriveEffect(), new DrawNoseEffect()]);
+const canvasEffects = ref<CanvasEffect[]>([new AIMeshEffect(), new PongGameEffect()]);
 
 const currentEffect = ref<Effect | null>(null);
 const currentEffectType = ref<"three" | "canvas" | undefined>();

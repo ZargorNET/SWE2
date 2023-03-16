@@ -4,8 +4,8 @@ import type {Results} from "@mediapipe/holistic";
 import {FACEMESH_TESSELATION, HAND_CONNECTIONS, POSE_CONNECTIONS} from "@mediapipe/holistic";
 import {drawConnectors, drawLandmarks} from "@mediapipe/drawing_utils";
 
-export default class DebugMeshEffect implements CanvasEffect, HolisticEffect {
-    name: String = "debugMesh";
+export default class AIMeshEffect implements CanvasEffect, HolisticEffect {
+    name: String = "AI Mesh";
 
     ctx: CanvasRenderingContext2D = null!;
 

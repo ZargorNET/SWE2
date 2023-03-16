@@ -24,8 +24,8 @@ class Sphere {
     }
 }
 
-export class DanielEffect implements ThreeEffect, HolisticEffect {
-    name: String = "Daniel";
+export class DrawNoseEffect implements ThreeEffect, HolisticEffect {
+    name: String = "Draw with nose";
     nose: NormalizedLandmark | undefined;
 
     onHolisticAIResults(results: Results): void {
@@ -43,7 +43,6 @@ export class DanielEffect implements ThreeEffect, HolisticEffect {
 
     mixer: AnimationMixer = null!;
     clock: Clock = new Clock();
-
     obj: Group = null!;
     scene: Scene = null!;
     spheres: Sphere[]  = [];
@@ -78,8 +77,6 @@ export class DanielEffect implements ThreeEffect, HolisticEffect {
 
     onRender(): void {
         const delta = this.clock.getDelta();
-        
-        
 
         if(this.nose) {
             const geometry = new SphereGeometry( 1, 32, 16 );
